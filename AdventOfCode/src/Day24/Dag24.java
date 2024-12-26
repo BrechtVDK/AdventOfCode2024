@@ -4,9 +4,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
@@ -19,6 +21,7 @@ public class Dag24 {
 	private String fileName = "src\\" + this.getClass().getPackage().getName() + "\\input.txt";
 	private Map<String, Integer> map = new HashMap<>();
 	private List<Instruction> instructions = new ArrayList<>();
+	private Map<String, Node> nodeMap = new HashMap<>();
 
 	public Dag24() {
 		long startTime = System.currentTimeMillis();
@@ -35,6 +38,7 @@ public class Dag24 {
 							instruction.gate);
 					instruction.done = true;
 					map.put(instruction.output, result);
+					
 				}
 			}
 		}
@@ -89,6 +93,21 @@ public class Dag24 {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	public class Node {
+		public Node parent1, parent2;
+		public String input;
+
+		public Node(String input) {
+			this.input=input;
+		}
+
+		public Node(Node parent1, Node parent2, String input) {
+			this(input);
+			this.parent1 = parent1;
+			this.parent2 = parent2;
 		}
 	}
 
