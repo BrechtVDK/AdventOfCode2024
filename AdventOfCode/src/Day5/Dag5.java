@@ -10,7 +10,9 @@ import java.util.stream.Stream;
 public class Dag5 {
 
 	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis();
 		Dag5 d = new Dag5();
+		System.out.printf("%n%d ms%n", System.currentTimeMillis() - startTime);
 
 	}
 
@@ -18,49 +20,87 @@ public class Dag5 {
 	private List<int[]> rules = new ArrayList<>();
 	private List<List<Integer>> updates = new ArrayList<>();
 	private List<List<Integer>> correctUpdates = new ArrayList<>();
-	int sumMiddles = 0;
+	private List<List<Integer>> incorrectUpdates = new ArrayList<>();
+	private List<List<Integer>> updated = new ArrayList<>();
 
 	public Dag5() {
+
 		readFile();
-		calculate();
-		System.out.println("sum= " + sumMiddles);
+		part1();
+		part2();
 
 	}
 
-	private void calculate() {
+	private void part1() {
 		for (List<Integer> update : updates) {
-			boolean flag = false;
+			boolean correct = true;
 			for (int i = 0; i < update.size(); i++) {
 				for (int[] rule : rules) {
 					if (rule[0] == update.get(i)) {
 						for (int j = 0; j < i; j++) {
 							if (update.get(j) == rule[1]) {
-								flag = true;
+								correct = false;
 								break;
 							}
 						}
 					}
 				}
 			}
-			if (!flag) {
+			if (correct) {
 				correctUpdates.add(update);
+			} else {
+				incorrectUpdates.add(update);
 			}
 		}
-		for (List<Integer> list : correctUpdates) {
-			int size = list.size();
-			int middle = list.get(size / 2);
-			sumMiddles += middle;
+		System.out.println(sumOfMiddlePages(correctUpdates));
+	}
+
+	private int sumOfMiddlePages(List<List<Integer>> updates) {
+		int sum = 0;
+		for (List<Integer> list : updates) {
+			sum += list.get(list.size() / 2);
 		}
+		return sum;
+	}
+
+	private void part2() {
+		for (List<Integer> update : incorrectUpdates) {
+			boolean correct = false;
+			while (!correct) {
+				boolean breakFlag = false;
+				for (int i = 0; i < update.size(); i++) {
+					for (int[] rule : rules) {
+						if (rule[0] == update.get(i)) {
+							for (int j = 0; j < i; j++) {
+								if (update.get(j) == rule[1]) {
+									int temp = update.get(j);
+									update.set(j, update.get(i));
+									update.set(i, temp);
+									breakFlag = true;
+									break;
+								}
+							}
+							if (breakFlag)
+								break;
+						}
+					}
+					if (breakFlag)
+						break;
+				}
+				if (breakFlag)
+					continue;
+				correct = true;
+			}
+
+		}
+		System.out.println(sumOfMiddlePages(incorrectUpdates));
 	}
 
 	private void readFile() {
 		try (Stream<String> stream = Files.lines(Paths.get(fileName))) {
 			stream.forEach(line -> {
-
 				Scanner sc = new Scanner(line);
-
 				String next = sc.next();
-
 				if (next.length() == 5) {
 					String[] ruleString = next.split("\\|");
 					int[] rule = new int[2];

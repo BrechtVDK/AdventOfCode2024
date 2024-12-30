@@ -26,7 +26,6 @@ public class Dag3 {
 
 	public Dag3() {
 		readFile(true);
-		calculate(mulList);
 		System.out.println(calculate(mulList));
 		readFile(false);
 		System.out.println(calculate(mulList2));
