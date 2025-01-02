@@ -3,54 +3,62 @@ package Day11;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Dag11 {
 
 	public static void main(String[] args) {
+		long startTime = System.currentTimeMillis();
 		Dag11 d = new Dag11();
+		System.out.printf("%n%d ms%n", System.currentTimeMillis() - startTime);
 
 	}
 
 	private String fileName = "src\\Day11\\input.txt";
 	private List<Stone> stones = new ArrayList<>();
+	private Map<BlinkToStone, Long> memo = new HashMap<>();
 	long sum = 0;
 
 	public Dag11() {
 		readFile();
-		/*
-		 * for (int i = 0; i < 25; i++) { blinkToStones(); // stones.forEach(x ->
-		 * System.out.print(x.toString())); // System.out.println();
-		 * System.out.printf("Stones after blinking %d times: %d%n", i + 1,
-		 * stones.size()); }
-		 */
-		int counter = 1;
 		for (Stone stone : stones) {
-			System.out.printf("Stone %d%n", counter++);
+			sum += blinkToStoneXTimes(25, stone);
+		}
+		System.out.println(sum);
+		sum = 0;
+		for (Stone stone : stones) {
 			sum += blinkToStoneXTimes(75, stone);
 		}
-		System.out.printf("Stones after blinking 75 times: %d%n", sum);
+		System.out.println(sum);
 
 	}
 
-	private int blinkToStoneXTimes(int times, Stone stone) {
-		List<Stone> list = List.of(stone);
-		for (int i = 0; i < times; i++) {
-			System.out.printf("%d ",i);
-			List<Stone> newStoneList = new ArrayList<>();
-			list.forEach(s -> s.blink().forEach(blinkStone -> newStoneList.add(blinkStone)));
-			list = newStoneList;
+	record BlinkToStone(long nrOnStone, int blinkXTimes) {
+	}
+
+	private long blinkToStoneXTimes(int times, Stone stone) {
+		if (times == 0) {
+			return 1;
 		}
-		System.out.println();
-		return list.size();
-	}
+		BlinkToStone key = new BlinkToStone(stone.getNr(), times);
+		if (memo.containsKey(key)) {
+			return memo.get(key);
+		}
 
-	private void blinkToStones() {
+		long sum = 0;
+
 		List<Stone> newStoneList = new ArrayList<>();
-		stones.forEach(stone -> stone.blink().forEach(blinkStone -> newStoneList.add(blinkStone)));
-		stones = newStoneList;
+		stone.blink().forEach(newStoneList::add);
+		for (Stone s : newStoneList) {
+			sum += blinkToStoneXTimes(times - 1, s);
+		}
+		memo.put(key, sum);
+		return sum;
 	}
 
 	private void readFile() {

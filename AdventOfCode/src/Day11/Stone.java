@@ -1,6 +1,7 @@
 package Day11;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Stone {
 	private long nr;
@@ -12,7 +13,7 @@ public class Stone {
 	}
 
 	private void setHasEvenNumberDigits() {
-		hasEvenNumberDigits = String.format("%d", this.nr).length() % 2 == 0;
+		hasEvenNumberDigits = Long.toString(this.nr).length() % 2 == 0;
 	}
 
 	public long getNr() {
@@ -24,11 +25,11 @@ public class Stone {
 			return List.of(new Stone(1));
 		}
 		if (hasEvenNumberDigits) {
-			String stringNr = String.format("%d", this.nr);
+			String stringNr = Long.toString(this.nr);
 			String stone1 = stringNr.substring(0, stringNr.length() / 2);
 			String stone2 = stringNr.substring(stringNr.length() / 2);
 			// remove leading 0
-			while (stone2.length()>1 && stone2.charAt(0) == '0') {
+			while (stone2.length() > 1 && stone2.charAt(0) == '0') {
 				stone2 = stone2.substring(1);
 			}
 			return List.of(new Stone(Long.parseLong(stone1)), new Stone(Long.parseLong(stone2)));
@@ -36,6 +37,7 @@ public class Stone {
 			return List.of(new Stone(nr * 2024));
 		}
 	}
+
 
 	@Override
 	public String toString() {
